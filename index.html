@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="UTF-8" />
+    <title>SAP EcoTrace Sustainability Dashboard</title>
+    <style>
+      :root {
+        --sap-blue: #008fd3;
+        --eco-green: #2ea64a;
+        --eco-light-green: #7bcf6a;
+        --bg-main: #f3f6fb;
+        --card-bg: #ffffff;
+        --card-border: #dde4f2;
+        --text-main: #1f2933;
+        --text-muted: #6b7280;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg-main);
+        margin: 0;
+        padding: 0;
+        color: var(--text-main);
+      }
+
+      .app-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Top header with logo */
+      .app-header {
+        background: linear-gradient(120deg, var(--sap-blue), var(--eco-green));
+        color: #ffffff;
+        padding: 14px 24px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+      }
+
+      .header-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .logo-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo-wrap img {
+        height: 40px;
+        width: auto;
+        display: block;
+      }
+
+      .header-title-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .app-title {
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+
+      .app-subtitle {
+        font-size: 12px;
+        opacity: 0.9;
+      }
+
+      /* Main content */
+      .container {
+        max-width: 1200px;
+        margin: 18px auto 32px auto;
+        padding: 0 24px;
+        flex: 1;
+      }
+
+      .subtitle {
+        margin-bottom: 16px;
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .filters label {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-right: 4px;
+      }
+
+      .filters input[type="date"],
+      .filters select {
+        padding: 4px 8px;
+        font-size: 12px;
+        border-radius: 6px;
+        border: 1px solid #c9d3e7;
+        background: #ffffff;
+      }
+
+      .filters button {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        background: #ffffff;
+        color: var(--text-main);
+        border-color: #d0dae9;
+        transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+      }
+
+      .filters button:hover {
+        background: #f0f4ff;
+        box-shadow: 0 0 0 2px rgba(0, 143, 211, 0.15);
+      }
+
+      .filters button.primary {
+        background: var(--sap-blue);
+        color: #ffffff;
+        border-color: transparent;
+      }
+
+      .filters button.primary:hover {
+        background: #0071a7;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 14px;
+        padding: 14px 16px;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.03);
+        border: 1px solid var(--card-border);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        border-left: 4px solid rgba(0, 143, 211, 0.7);
+        opacity: 0.9;
+        pointer-events: none;
+      }
+
+      .card:nth-child(3)::before,
+      .card:nth-child(4)::before {
+        border-left-color: rgba(46, 166, 74, 0.85);
+      }
+
+      .card-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.11em;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+
+      .card-value {
+        font-size: 22px;
+        font-weight: 600;
+      }
+
+      .card-unit {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      .charts {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        grid-auto-rows: minmax(320px, auto);
+        gap: 16px;
+      }
+
+      .chart-full {
+        grid-column: 1 / span 2;
+      }
+
+      .chart-container {
+        background: var(--card-bg);
+        border-radius: 14px;
+        padding: 16px 18px;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.03);
+        border: 1px solid var(--card-border);
+      }
+
+      .chart-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .chart-title {
+        font-size: 13px;
+        color: var(--text-main);
+        font-weight: 500;
+      }
+
+      .chart-select {
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid #c9d3e7;
+        background: #f9fafb;
+      }
+
+      .status {
+        margin-top: 16px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      @media (max-width: 900px) {
+        .charts {
+          grid-template-columns: 1fr;
+        }
+        .chart-full {
+          grid-column: 1;
+        }
+      }
+    </style>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <!-- Top header with EcoTrace logo -->
+      <header class="app-header">
+        <div class="header-inner">
+          <div class="logo-wrap">
+            <img src="https://lh3.googleusercontent.com/d/1iYWqyPQV9elWueU675VGjRXKkNdJEnkB" alt="SAP EcoTrace logo">
+          </div>
+
+          <div class="header-title-group">
+            <div class="app-title">SAP EcoTrace Dashboard</div>
+            <div class="app-subtitle">Automated ESG insights from incoming invoices and operational data</div>
+          </div>
+        </div>
+      </header>
+
+      <main class="container">
+        <div class="subtitle">
+          Live metrics from the Google Sheet. Empty rows and duplicates are filtered on the server. Use the filters to
+          focus on a specific reporting period.
+        </div>
+
+        <div class="filters">
+          <label for="startDate">Start date:</label>
+          <input type="date" id="startDate" />
+
+          <label for="endDate">End date:</label>
+          <input type="date" id="endDate" />
+
+          <button type="button" onclick="applyFilter()">Apply</button>
+          <button type="button" onclick="clearFilter()">Clear</button>
+
+          <label for="yearSelect">Year:</label>
+          <select id="yearSelect">
+            <option value="">All</option>
+          </select>
+
+          <button type="button" onclick="applyYear()">Use year</button>
+          <button type="button" class="primary" onclick="downloadReport()">Download report</button>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <div class="card-title">Invoices processed</div>
+            <div id="metric-invoices" class="card-value">-</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Total spend</div>
+            <div id="metric-price" class="card-value">-</div>
+            <div class="card-unit">EUR (unique rows)</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Electricity usage</div>
+            <div id="metric-energy" class="card-value">-</div>
+            <div class="card-unit">kWh</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Fuel consumption</div>
+            <div id="metric-fuel" class="card-value">-</div>
+            <div class="card-unit">L</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Cloud compute</div>
+            <div id="metric-cloud" class="card-value">-</div>
+            <div class="card-unit">CloudHours</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Cloud storage</div>
+            <div id="metric-storage" class="card-value">-</div>
+            <div class="card-unit">GB-month</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Data transfer</div>
+            <div id="metric-transfer" class="card-value">-</div>
+            <div class="card-unit">GB</div>
+          </div>
+        </div>
+
+        <div class="charts">
+          <div class="chart-container chart-full">
+            <div class="chart-title-row">
+              <div class="chart-title">Monthly time series</div>
+              <select id="timeSeriesMetric" class="chart-select" onchange="redrawTimeSeriesChart()">
+                <option value="energy_spend">Energy vs spend</option>
+                <option value="energy_only">Electricity kWh</option>
+                <option value="fuel">Fuel litres</option>
+                <option value="cloud_hours">Cloud compute hours</option>
+                <option value="cloud_storage">Cloud storage GB-month</option>
+                <option value="transfer">Data transfer GB</option>
+              </select>
+            </div>
+            <div id="chart_time_series" style="width: 100%; height: 320px;"></div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-title">Spend by category</div>
+            <div id="chart_spend_pie" style="width: 100%; height: 320px;"></div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-title">Distribution of invoice amounts</div>
+            <div id="chart_price_hist" style="width: 100%; height: 320px;"></div>
+          </div>
+        </div>
+
+        <div id="status" class="status">Loading data from sheet...</div>
+      </main>
+    </div>
+
+    <script>
+      let chartsReady = false;
+      let currentMonthlySeries = [];
+
+      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.setOnLoadCallback(function () {
+        chartsReady = true;
+        loadDashboard();
+        loadYears();
+      });
+
+      function formatNumber(n, decimals) {
+        if (typeof n !== 'number') return '0';
+        const d = typeof decimals === 'number' ? decimals : 0;
+        return n.toLocaleString('de-DE', {
+          minimumFractionDigits: d,
+          maximumFractionDigits: d
+        });
+      }
+
+      function loadDashboard() {
+        const startInput = document.getElementById('startDate').value;
+        const endInput = document.getElementById('endDate').value;
+
+        document.getElementById('status').textContent =
+          'Loading data from sheet...' +
+          (startInput || endInput
+            ? ' Filter: ' + (startInput || '...') + ' to ' + (endInput || '...')
+            : '');
+
+        google.script.run
+          .withSuccessHandler(function (result) {
+            if (!result) {
+              document.getElementById('status').textContent = 'No data received from server.';
+              return;
+            }
+
+            document.getElementById('metric-invoices').textContent =
+              formatNumber(result.totalInvoices, 0);
+            document.getElementById('metric-price').textContent =
+              formatNumber(result.totalPriceEur, 2);
+            document.getElementById('metric-energy').textContent =
+              formatNumber(result.totalEnergyKwh, 0);
+            document.getElementById('metric-fuel').textContent =
+              formatNumber(result.totalFuelLitres, 0);
+            document.getElementById('metric-cloud').textContent =
+              formatNumber(result.totalCloudHours, 0);
+            document.getElementById('metric-storage').textContent =
+              formatNumber(result.totalStorageGbMonth, 0);
+            document.getElementById('metric-transfer').textContent =
+              formatNumber(result.totalTransferGb, 0);
+
+            document.getElementById('status').textContent =
+              'Last refreshed: ' + new Date().toLocaleString();
+
+            if (chartsReady) {
+              loadChartData(startInput, endInput);
+              loadSpendPie(startInput, endInput);
+              loadPriceHistogram(startInput, endInput);
+            }
+          })
+          .withFailureHandler(function (err) {
+            document.getElementById('status').textContent =
+              'Error loading data: ' + err.message;
+          })
+          .getDashboardSummary(startInput, endInput);
+      }
+
+      function loadChartData(startInput, endInput) {
+        google.script.run
+          .withSuccessHandler(function (series) {
+            currentMonthlySeries = series || [];
+            redrawTimeSeriesChart();
+          })
+          .withFailureHandler(function (err) {
+            console.log('Error loading time series: ' + err.message);
+          })
+          .getMonthlyTimeSeries(startInput, endInput);
+      }
+
+      function redrawTimeSeriesChart() {
+        const container = document.getElementById('chart_time_series');
+        if (!currentMonthlySeries || !currentMonthlySeries.length) {
+          container.innerHTML = 'No data available for this period.';
+          return;
+        }
+
+        const metric = document.getElementById('timeSeriesMetric').value;
+
+        const data = new google.visualization.DataTable();
+        data.addColumn('string', 'Month');
+
+        if (metric === 'energy_spend') {
+          data.addColumn('number', 'Energy kWh');
+          data.addColumn('number', 'Spend EUR');
+        } else {
+          data.addColumn('number', 'Value');
+        }
+
+        currentMonthlySeries.forEach(function (p) {
+          const month = p.month;
+          let value1 = 0;
+          let value2 = null;
+
+          if (metric === 'energy_spend') {
+            value1 = Number(p.totalEnergyKwh || 0);
+            value2 = Number(p.totalPriceEur || 0);
+            data.addRow([month, value1, value2]);
+          } else if (metric === 'energy_only') {
+            value1 = Number(p.totalEnergyKwh || 0);
+            data.addRow([month, value1]);
+          } else if (metric === 'fuel') {
+            value1 = Number(p.totalFuelLitres || 0);
+            data.addRow([month, value1]);
+          } else if (metric === 'cloud_hours') {
+            value1 = Number(p.totalCloudHours || 0);
+            data.addRow([month, value1]);
+          } else if (metric === 'cloud_storage') {
+            value1 = Number(p.totalStorageGbMonth || 0);
+            data.addRow([month, value1]);
+          } else if (metric === 'transfer') {
+            value1 = Number(p.totalTransferGb || 0);
+            data.addRow([month, value1]);
+          }
+        });
+
+        const baseOptions = {
+          legend: { position: 'bottom' },
+          chartArea: { left: 60, top: 20, right: 20, height: '65%' },
+          hAxis: { slantedText: true, slantedTextAngle: 45 },
+          colors: ['#2ea64a', '#008fd3']
+        };
+
+        let options = baseOptions;
+
+        if (metric === 'energy_spend') {
+          options = Object.assign({}, baseOptions, {
+            vAxes: {
+              0: { title: 'kWh' },
+              1: { title: 'EUR' }
+            },
+            series: {
+              0: { targetAxisIndex: 0 },
+              1: { targetAxisIndex: 1 }
+            }
+          });
+        }
+
+        const chart = new google.visualization.LineChart(container);
+        chart.draw(data, options);
+      }
+
+      function loadSpendPie(startInput, endInput) {
+        google.script.run
+          .withSuccessHandler(function (categories) {
+            const container = document.getElementById('chart_spend_pie');
+            if (!categories || !categories.length) {
+              container.innerHTML = 'No data for this period.';
+              return;
+            }
+
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Category');
+            data.addColumn('number', 'Spend EUR');
+
+            categories.forEach(function (c) {
+              data.addRow([c.category, Number(c.totalPriceEur || 0)]);
+            });
+
+            const options = {
+              pieHole: 0.45,
+              chartArea: { left: 10, top: 15, right: 10, bottom: 10, width: '100%', height: '85%' },
+              legend: { position: 'right' },
+              colors: ['#2ea64a', '#008fd3', '#7bcf6a', '#4b8ac9', '#f4b400', '#e67c73', '#a142f4', '#0f9d58']
+            };
+
+            const chart = new google.visualization.PieChart(container);
+            chart.draw(data, options);
+          })
+          .withFailureHandler(function (err) {
+            console.log('Error loading spend pie: ' + err.message);
+          })
+          .getSpendByCategory(startInput, endInput);
+      }
+
+      function loadPriceHistogram(startInput, endInput) {
+        google.script.run
+          .withSuccessHandler(function (amounts) {
+            const container = document.getElementById('chart_price_hist');
+            if (!amounts || !amounts.length) {
+              container.innerHTML = 'No data for this period.';
+              return;
+            }
+
+            const data = new google.visualization.DataTable();
+            data.addColumn('number', 'Invoice amount EUR');
+
+            amounts.forEach(function (a) {
+              data.addRow([Number(a)]);
+            });
+
+            const options = {
+              legend: { position: 'none' },
+              chartArea: { left: 60, top: 20, right: 20, height: '70%' },
+              hAxis: { title: 'Invoice amount (EUR)' },
+              vAxis: { title: 'Count' },
+              colors: ['#008fd3']
+            };
+
+            const chart = new google.visualization.Histogram(container);
+            chart.draw(data, options);
+          })
+          .withFailureHandler(function (err) {
+            console.log('Error loading histogram: ' + err.message);
+          })
+          .getInvoiceAmounts(startInput, endInput);
+      }
+
+      function applyFilter() {
+        loadDashboard();
+      }
+
+      function clearFilter() {
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        loadDashboard();
+      }
+
+      function loadYears() {
+        google.script.run
+          .withSuccessHandler(function (years) {
+            const select = document.getElementById('yearSelect');
+            select.innerHTML = '<option value="">All</option>';
+            if (years && years.length) {
+              years.forEach(function (y) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                select.appendChild(opt);
+              });
+              select.value = years[years.length - 1];
+            }
+          })
+          .withFailureHandler(function (err) {
+            console.log('Error loading years: ' + err.message);
+          })
+          .getAvailableYears();
+      }
+
+      function applyYear() {
+        const year = document.getElementById('yearSelect').value;
+        if (!year) {
+          clearFilter();
+          return;
+        }
+        document.getElementById('startDate').value = year + '-01-01';
+        document.getElementById('endDate').value = year + '-12-31';
+        loadDashboard();
+      }
+
+      function downloadReport() {
+        const year = document.getElementById('yearSelect').value;
+        if (!year) {
+          alert('Please select a year first.');
+          return;
+        }
+
+        document.getElementById('status').textContent = 'Generating ESG report for ' + year + '...';
+
+        google.script.run
+          .withSuccessHandler(function (fileId) {
+            if (!fileId) {
+              document.getElementById('status').textContent =
+                'No report could be generated for ' + year + ' (no data or error).';
+              return;
+            }
+
+            const url =
+              'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(fileId);
+            window.open(url, '_blank');
+
+            document.getElementById('status').textContent =
+              'Report generated for ' + year + '.';
+          })
+          .withFailureHandler(function (err) {
+            document.getElementById('status').textContent =
+              'Error generating report: ' + err.message;
+          })
+          .generateEsgReportForYear(year);
+      }
+    </script>
+  </body>
+</html>
