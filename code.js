@@ -1,30 +1,30 @@
 /*******************************
  CONFIG
 *******************************/
-const SHEET_ID = '1cQIGk5OFE_epVMczthewXAvDluyQ9vVkhiCYwujZWz4';
+const SHEET_ID = '...';
 const PROCESSED_LABEL_NAME = 'SAP_SUSTAINABILITY_PROCESSED';
-const LOG_EMAIL = 'houssem.kotti26@gmail.com';
+const LOG_EMAIL = '...';
 
 /***********************
  SAP Build Process Automation
 ************************/
 const SPA_API_URL = "https://spa-api-gateway-bpi-eu-prod.cfapps.eu10.hana.ondemand.com";
 const SPA_TOKEN_URL = "https://hackatum.authentication.eu10.hana.ondemand.com/oauth/token";
-const SPA_CLIENT_ID = "sb-adcf8c2e-99c5-4ae2-9e28-c0ef5f56e78a!b605607|xsuaa!b120249";
-const SPA_CLIENT_SECRET = "dc8ac31c-f9c3-4fe4-97c1-b951daadfeb7$tHte333ltNrW_v7ws864AkKLQGhI0-uX7l93Pxyq7BU=";
-const SPA_API_KEY = "QBvlzsXZoiatJbK9cca98l0tQRCKxSss";
-const SPA_ENV = "hackatum";
-const SPA_DEFINITION_ID = 'eu10.hackatum.sapecotrace1.main';
+const SPA_CLIENT_ID = "...";
+const SPA_CLIENT_SECRET = "...";
+const SPA_API_KEY = "...";
+const SPA_ENV = "...";
+const SPA_DEFINITION_ID = '...';
 
 /***********************
  SAP AI Core
 ************************/
 const AIC_API_URL = "https://api.ai.prod.eu-central-1.aws.ml.hana.ondemand.com";
 const AIC_TOKEN_URL = "https://hackatum.authentication.eu10.hana.ondemand.com/oauth/token";
-const AIC_CLIENT_ID = "sb-5e850a7d-9a31-4135-b9f4-201c66eb5bd4!b605607|aicore!b540";
-const AIC_CLIENT_SECRET = "b73e1440-9555-41d2-95e7-9778fb58721a$DJ8ZMJ5YesMJ2SmE90iRnVz2Z-ayxkWnH1KY69neG-Y=";
+const AIC_CLIENT_ID = "...";
+const AIC_CLIENT_SECRET = "...";
 const AIC_RESOURCE_GROUP = "default";
-const AIC_DEPLOYMENT_ID = 'de9c0c220cad16ac';
+const AIC_DEPLOYMENT_ID = '...';
 
 
 // Assumes a global constant SHEET_ID is defined
